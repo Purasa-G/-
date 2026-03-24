@@ -1,0 +1,11 @@
+<!-- templates/dashboard.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>欢迎，{{ username }}！</h2>
+<p>这里是你的加密文件保险箱。</p>
+<ul>
+    <li>✅ 用户系统已完成</li>
+    <li>⏳ 下一步：上传/下载加密文件</li>
+</ul>
+<a href="{{ url_for('logout') }}">退出登录</a>
+{% endblock %}

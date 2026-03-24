@@ -1,0 +1,11 @@
+<!-- templates/register.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>注册</h2>
+<form method="post">
+    <input type="text" name="username" placeholder="用户名" required>
+    <input type="password" name="password" placeholder="密码" required>
+    <button type="submit">注册</button>
+</form>
+<p>已有账号？<a href="{{ url_for('login') }}">立即登录</a></p>
+{% endblock %}

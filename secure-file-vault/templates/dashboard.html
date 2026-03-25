@@ -2,10 +2,58 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>欢迎，{{ username }}！</h2>
-<p>这里是你的加密文件保险箱。</p>
-<ul>
-    <li>✅ 用户系统已完成</li>
-    <li>⏳ 下一步：上传/下载加密文件</li>
+
+<!-- 上传表单 -->
+<h3>上传新文件</h3>
+<form method="post" action="{{ url_for('upload_file') }}" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <input type="password" name="password" placeholder="设置加密密码" required>
+    <button type="submit">加密上传</button>
+</form>
+
+<!-- 文件列表 -->
+<h3>我的文件</h3>
+{% if files %}
+<ul style="list-style: none; padding: 0;">
+    {% for f in files %}
+    <li style="margin-bottom: 12px; padding: 10px; border: 1px solid #eee; border-radius: 6px; background: #f9f9f9;">
+        <strong>{{ f.filename }}</strong> 
+        ({{ f.file_size }} 字节, {{ f.uploaded_at.strftime('%Y-%m-%d %H:%M') }})
+        
+        <!-- 下载链接 -->
+        <a href="{{ url_for('download_file', file_id=f.id) }}" style="margin-left: 10px;">下载</a>
+        
+        <!-- 分享状态与操作 -->
+        {% if f.share_token and f.share_expires_at > now and not f.share_used %}
+            <span style="color: green; margin-left: 10px;">✓ 已分享（24小时内有效）</span>
+            <!-- 取消分享按钮 -->
+            <form method="post" action="{{ url_for('unshare_file', file_id=f.id) }}" style="display: inline; margin-left: 8px;">
+                <button type="submit" style="font-size:12px; padding:2px 6px; background:#ff6b6b; color:white; border:none; cursor:pointer;">取消分享</button>
+            </form>
+        {% elif f.share_token and (f.share_expires_at <= now or f.share_used) %}
+            <span style="color: gray; margin-left: 10px;">⚠️ 分享已失效</span>
+            <form method="post" action="{{ url_for('create_share_link', file_id=f.id) }}" style="display: inline; margin-left: 8px;">
+                <button type="submit" style="font-size:12px; padding:2px 6px; background:#2196F3; color:white; border:none; cursor:pointer;">重新分享</button>
+            </form>
+        {% else %}
+            <!-- 未分享：显示生成按钮 -->
+            <form method="post" action="{{ url_for('create_share_link', file_id=f.id) }}" style="display: inline; margin-left: 10px;">
+                <button type="submit" style="font-size:12px; padding:2px 6px; background:#4CAF50; color:white; border:none; cursor:pointer;">分享</button>
+            </form>
+        {% endif %}
+        
+        <!-- 删除按钮（始终显示） -->
+        <form method="post" action="{{ url_for('delete_file', file_id=f.id) }}" 
+              style="display: inline; margin-left: 8px;"
+              onsubmit="return confirm('确定永久删除文件 “{{ f.filename }}” 吗？此操作不可恢复！');">
+            <button type="submit" style="font-size:12px; padding:2px 6px; background:#d9534f; color:white; border:none; cursor:pointer;">删除</button>
+        </form>
+    </li>
+    {% endfor %}
 </ul>
+{% else %}
+<p>暂无文件。</p>
+{% endif %}
+
 <a href="{{ url_for('logout') }}">退出登录</a>
 {% endblock %}

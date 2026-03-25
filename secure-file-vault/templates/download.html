@@ -1,0 +1,11 @@
+<!-- templates/download.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>下载：{{ file.filename }}</h2>
+<p>请输入加密时设置的密码：</p>
+<form method="post">
+    <input type="password" name="password" placeholder="密码" required>
+    <button type="submit">解密并下载</button>
+</form>
+<a href="{{ url_for('dashboard') }}">返回</a>
+{% endblock %}
